@@ -1,0 +1,95 @@
+Ad-Soyad:Muhammed Metin Kızıl 
+Öğrenci No:250541038
+
+digraph ATM_Para_Cekme_Sistemi {
+    
+    // 1. Genel Grafik ve Düğüm Ayarları (Akış Şeması Stilleri)
+    graph [
+        rankdir=TB; // Akış Yönü: Yukarıdan Aşağıya (Top to Bottom)
+        label="ATM Para Çekme Sistemi Akış Şeması";
+        labelloc=t;
+        fontname="Helvetica";
+    ];
+    
+    // Varsayılan Düğüm Stilleri
+    node [
+        fontname="Helvetica";
+        style=filled;
+    ];
+    
+    // Varsayılan Kenar Stilleri
+    edge [
+        fontname="Helvetica";
+    ];
+
+    
+    // 2. DÜĞÜM TANIMLAMALARI (Farklı Şekiller Kullanılarak)
+    
+    // Başlangıç ve Bitiş
+    Start [label="BAŞLA", shape=ellipse, fillcolor="#A0E7E5"];
+    Finish_PIN [label="KART ALIKONULDU/\nİşlem İptal", shape=ellipse, fillcolor="#FFB3B3"];
+    Finish_Normal [label="İşlem Bitti (BİTİR)", shape=ellipse, fillcolor="#A0E7E5"];
+
+    // Girdi/Çıktı & İşlem Adımları
+    PIN_Oku [label="PIN OKU\n(Kalan Hak: 3)", shape=parallelogram, fillcolor="#FFD1DC"];
+    Islem_Tekrar [label="Başka İşlem Yapılsın mı? (OKU CEVAP)", shape=parallelogram, fillcolor="#FFD1DC"];
+    Tutar_Oku [label="Çekilecek Tutar OKU", shape=parallelogram, fillcolor="#FFD1DC"];
+    Para_Cek [label="BAKİYE = BAKIYE - TUTAR\nCEKILEN_TOPLAM += TUTAR\nYAZ: Para Verildi, Yeni Bakiye", shape=box, fillcolor="#D9F7D4"];
+
+    // Karar Mekanizmaları (DÖNGÜ ve EĞER-İSE)
+    PIN_Kontrol [label="PIN = Doğru PIN mi?", shape=diamond, fillcolor="#FFECB3"];
+    PIN_Hak [label="PIN_HAKKI > 0 mı?", shape=diamond, fillcolor="#FFECB3"];
+    Tekrar_Kontrol [label="CEVAP = 'EVET' mi?", shape=diamond, fillcolor="#FFECB3"];
+    Tutar_Kontrol [label="Tutar 20 TL Katı mı?", shape=diamond, fillcolor="#FFECB3"];
+    Bakiye_Kontrol [label="Tutar <= Bakiye mi?", shape=diamond, fillcolor="#FFECB3"];
+    Limit_Kontrol [label="Tutar + Çekilen Toplam <= Günlük Limit mi?", shape=diamond, fillcolor="#FFECB3"];
+    Hata_20TL [label="YAZ: Hata - 20 TL Katı değil", shape=box, fillcolor="#FBE6E6"];
+    Hata_Bakiye [label="YAZ: Hata - Yetersiz Bakiye", shape=box, fillcolor="#FBE6E6"];
+    Hata_Limit [label="YAZ: Hata - Günlük Limit Aşıldı", shape=box, fillcolor="#FBE6E6"];
+    
+    
+    // 3. AKIŞ YÖNLENDİRMELERİ (Kenarlar)
+    
+    // A) PIN DOĞRULAMA (Döngü)
+    Start -> PIN_Oku;
+    PIN_Oku -> PIN_Kontrol;
+    
+    // PIN Doğru İse
+    PIN_Kontrol -> Tutar_Oku [label="Evet", color=green];
+    
+    // PIN Yanlış İse (Hak Kontrolü)
+    PIN_Kontrol -> PIN_Hak [label="Hayır", color=red];
+    PIN_Hak -> PIN_Oku [label="Evet (Hak Var)", dir=back, style=dashed]; // Geri döngü
+    PIN_Hak -> Finish_PIN [label="Hayır (Hak Yok)", color=red, style=bold]; // Bitiş
+    
+    // B) ANA İŞLEM DÖNGÜSÜ (Tekrar Kontrolü)
+    
+    // 1. Tutar Kontrolü (20 TL Katları)
+    Tutar_Oku -> Tutar_Kontrol;
+    Tutar_Kontrol -> Bakiye_Kontrol [label="Evet", color=green];
+    Tutar_Kontrol -> Hata_20TL [label="Hayır", color=red];
+    Hata_20TL -> Islem_Tekrar;
+    
+    // 2. Bakiye Kontrolü
+    Bakiye_Kontrol -> Limit_Kontrol [label="Evet", color=green];
+    Bakiye_Kontrol -> Hata_Bakiye [label="Hayır", color=red];
+    Hata_Bakiye -> Islem_Tekrar;
+    
+    // 3. Günlük Limit Kontrolü
+    Limit_Kontrol -> Para_Cek [label="Evet", color=green];
+    Limit_Kontrol -> Hata_Limit [label="Hayır", color=red];
+    Hata_Limit -> Islem_Tekrar;
+    
+    // İşlem Sonucu
+    Para_Cek -> Islem_Tekrar;
+    
+    // C) İŞLEM TEKRARI
+    Islem_Tekrar -> Tekrar_Kontrol;
+    
+    // Tekrar Et
+    Tekrar_Kontrol -> Tutar_Oku [label="EVET", color=blue]; // İşlemin başına dön
+    
+    // Bitir
+    Tekrar_Kontrol -> Finish_Normal [label="HAYIR", color=darkblue, style=bold];
+
+}
