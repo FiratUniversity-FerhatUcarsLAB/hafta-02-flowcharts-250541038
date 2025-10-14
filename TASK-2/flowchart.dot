@@ -1,0 +1,74 @@
+digraph AlisverisSepetiSistemiDikey {
+    // Genel Graf Ayarları
+    rankdir=TB; // Yukarıdan aşağıya akış
+    node [shape=box, style="filled", color="#F0E68C"]; // Varsayılan node stili
+
+    // Başlangıç ve Bitiş Node'ları
+    start [label="1. Sisteme Başlangıç", shape=oval, fillcolor="#90EE90"];
+    end [label="10. Sipariş Tamamlandı", shape=doubleoctagon, fillcolor="#90EE90"];
+
+    // Karar Node'ları (Koşullar) - Eşkenar Dörtgen
+    node [shape=diamond, fillcolor="#ADD8E6"];
+    KullaniciGiris [label="2. Kullanıcı Girişi Yapıldı mı? (Koşul)"];
+    StokKontrol [label="4. Ürün Stokta Var mı? (Koşul)"];
+    IndirimKodu [label="6. İndirim Kodu Uygulansın mı? (Koşul)"];
+    MinTutarKontrol [label="7. Sepet Tutarı >= 50 TL mi? (Koşul)"];
+    KargoKontrol [label="8. Sepet Tutarı >= 200 TL mi? (Koşul)"];
+    OdemeYontemi [label="9. Ödeme Yöntemi Seçildi mi? (Koşul)"];
+
+    // Süreç Node'ları (Kutu)
+    node [shape=box, fillcolor="#F0E68C"];
+    UrunSepeteEkle [label="3. Ürün Sepete Ekle"];
+    KargoUcretiHesapla [label="Kargo Ücreti Hesapla"];
+    SiparisOnayi [label="Sipariş Onayı Ver"];
+    OdemeYap [label="Ödeme İşlemi"];
+
+    // Döngü Node'ları (Trapez)
+    node [shape=trapezium, fillcolor="#FFA07A"];
+    UrunGezinme [label="3. Ürün Kategorileri Arasında Gezinme (Döngü)"];
+    SepetGoruntule [label="5. Sepeti Görüntüle / Düzenle"];
+    SepetDuzenleDongu [label="Düzenlemeye Devam Edilsin mi? (Döngü)"];
+
+
+    // Akış Bağlantıları
+    start -> KullaniciGiris;
+
+    // 2. Kullanıcı Giriş Kontrolü
+    KullaniciGiris -> UrunGezinme [label="Evet"];
+    KullaniciGiris -> start [label="Hayır", style=dashed, color=red];
+
+    // 3. Ürün Gezinme (Döngü) ve Sepete Ekle
+    UrunGezinme -> UrunSepeteEkle;
+    UrunSepeteEkle -> StokKontrol;
+
+    // 4. Stok Kontrolü (Koşul)
+    StokKontrol -> SepetGoruntule [label="Evet"];
+    StokKontrol -> UrunGezinme [label="Hayır (Stok Yok)", color=red];
+
+    // 5. Sepeti Görüntüleme ve Düzenleme (Döngü)
+    SepetGoruntule -> SepetDuzenleDongu;
+    SepetDuzenleDongu -> SepetGoruntule [label="Evet (Düzenle)", style=dashed, color=blue];
+    SepetDuzenleDongu -> IndirimKodu [label="Hayır (Devam Et)"];
+
+    // 6. İndirim Kodu Uygulanabilir (Koşul)
+    IndirimKodu -> MinTutarKontrol [label="Hayır/Uygulandı"];
+    IndirimKodu -> IndirimKodu [label="Evet (Uygula)", style=dashed, color=green];
+
+    // 7. Minimum 50 TL Kontrolü (Koşul)
+    MinTutarKontrol -> KargoKontrol [label="Evet"];
+    MinTutarKontrol -> SepetGoruntule [label="Hayır (Ekleme Gerek)", color=red];
+
+    // 8. Kargo Ücreti Hesaplama (Koşul: >= 200 TL ücretsiz)
+    KargoKontrol -> OdemeYontemi [label="Evet (Kargo Ücretsiz)"];
+    KargoKontrol -> KargoUcretiHesapla [label="Hayır (Kargo Ücretli)"];
+
+    KargoUcretiHesapla -> OdemeYontemi;
+
+    // 9. Ödeme Yöntemi Seçimi (Koşul)
+    OdemeYontemi -> OdemeYap [label="Evet"];
+    OdemeYontemi -> SepetGoruntule [label="Hayır", color=red, style=dashed];
+
+    // 10. Sipariş Onayı
+    OdemeYap -> SiparisOnayi;
+    SiparisOnayi -> end;
+}
