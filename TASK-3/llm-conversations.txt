@@ -1,0 +1,624 @@
+şimdi seninle iki farklı modül üzeninde çalışacağız sonra ikisini birleştireceğiz
+
+1. modülümüz
+
+Hastane randevu sistemi için algoritma: kimlik doğrulama, poliklinik
+
+secimi, doktor listesi görüntüleme, uygun saatleri gösterme, randevu
+
+onaylama ve SMS gönderme. Pseudocode yaz
+
+
+
+
+Harika bir başlangıç! Hastane randevu sistemi algoritması için pseudocode (sözde kod) taslağını aşağıda bulabilirsin. Bu taslak, temel adımları mantıksal bir sırayla gösterir.
+
+Modül 1: Hastane Randevu Sistemi Algoritması
+Bu pseudocode, temel bir randevu akışını temsil eder.
+
+Kod snippet'i
+
+FONKSİYON RandevuSistemiBaslat():
+    // 1. Kimlik Doğrulama
+    KullaniciAdi = KULLANICIDAN_GIRDI_AL("T.C. Kimlik Numaranızı girin:")
+    Sifre = KULLANICIDAN_GIRDI_AL("Şifrenizi girin:")
+
+    EĞER Kullaniciyi_Dogrula(KullaniciAdi, Sifre) BAŞARILI İSE:
+        Giris_Basarili = DOĞRU
+    DEĞİLSE:
+        EKRANA_YAZ("Hata: Kimlik doğrulama başarısız. Lütfen bilgilerinizi kontrol edin.")
+        RandevuSistemiBaslat() YENİDEN_BAŞLAT // Veya ÇIKIŞ yap
+        DÖN
+
+    // 2. Poliklinik Seçimi
+    PoliklinikListesi = Poliklinikleri_Veritabani_Getir()
+    EKRANA_YAZ("Lütfen bir poliklinik seçin:")
+    EKRANA_YAZ(PoliklinikListesi)
+    SecilenPoliklinik = KULLANICIDAN_SECIM_AL(PoliklinikListesi)
+
+    // 3. Doktor Listesi Görüntüleme
+    DoktorListesi = Poliklinik_Doktorlarini_Getir(SecilenPoliklinik)
+
+    EĞER DoktorListesi BOŞ DEĞİL İSE:
+        EKRANA_YAZ("Lütfen bir doktor seçin:")
+        EKRANA_YAZ(DoktorListesi)
+        SecilenDoktor = KULLANICIDAN_SECIM_AL(DoktorListesi)
+    DEĞİLSE:
+        EKRANA_YAZ("Seçilen poliklinikte doktor bulunmamaktadır. Lütfen başka bir poliklinik seçin.")
+        RandevuSistemiBaslat() YENİDEN_BAŞLAT // Veya Geri Adıma git
+        DÖN
+
+    // 4. Uygun Saatleri Gösterme
+    BugundenSonrakiGunler = TARIH_ARALIGI_BELIRLE(BUGÜN, 30_GÜN) // Örn: 30 günlük aralık
+    
+    HER Bir_Gun İÇİN BugundenSonrakiGunler'de:
+        UygunSaatler = Doktorun_Uygun_Saatlerini_Getir(SecilenDoktor, Bir_Gun)
+        
+        EĞER UygunSaatler BOŞ DEĞİL İSE:
+            EKRANA_YAZ("Doktor " + SecilenDoktor + " için " + Bir_Gun + " tarihindeki uygun saatler:")
+            EKRANA_YAZ(UygunSaatler)
+
+    SecilenTarihSaat = KULLANICIDAN_SECIM_AL("Randevu tarihi ve saatini seçin:")
+
+    // 5. Randevu Onaylama
+    YeniRandevuID = Randevu_Veritabanina_Kaydet(KullaniciAdi, SecilenDoktor, SecilenPoliklinik, SecilenTarihSaat)
+
+    EĞER YeniRandevuID BAŞARILI İSE:
+        EKRANA_YAZ("Randevunuz başarıyla oluşturulmuştur. Randevu ID: " + YeniRandevuID)
+        
+        // 6. SMS Gönderme
+        KullaniciTelefonNo = Kullanici_Telefon_Bilgisini_Getir(KullaniciAdi)
+        SMS_Metni = "Randevunuz oluşturuldu. Doktor: " + SecilenDoktor + ", Tarih/Saat: " + SecilenTarihSaat + ". Randevu ID: " + YeniRandevuID
+        SMS_Gonder(KullaniciTelefonNo, SMS_Metni)
+        
+        EKRANA_YAZ("Randevu bilgileriniz SMS olarak gönderilmiştir.")
+    DEĞİLSE:
+        EKRANA_YAZ("Hata: Randevu oluşturulamadı. Lütfen tekrar deneyin.")
+
+    DÖN
+Şimdi ikinci modül üzerinde çalışmaya hazırız. İkinci modülün detaylarını paylaşabilir misin?
+
+
+bunu bir kere detaylıca gözden geçir eksik veya hatalı bir şey var mı
+
+
+
+Harika, pseudocode'u detaylıca gözden geçirelim.
+
+Genel olarak algoritma çok sağlam ve mantıklı bir akışa sahip. Temel hastane randevu adımlarını eksiksiz bir şekilde kapsıyor.
+
+İşte bazı geliştirme ve detaylandırma önerileri ile gözden geçirme notlarım:
+
+Modül 1: Gözden Geçirme ve Geliştirmeler
+1. Kimlik Doğrulama (Adım 1)
+Mevcut Durum	Geliştirme/Detaylandırma Önerisi
+EĞER Kullaniciyi_Dogrula(...) BAŞARILI İSE:	Başarısız kimlik doğrulamada sadece RandevuSistemiBaslat() YENİDEN_BAŞLAT diyor. Gerçek bir sistemde, güvenlik nedeniyle belirli sayıda başarısız denemeden sonra hesabı kilitleme mekanizması eklenmeli.
+Öneri: Geri dönüş tipi olarak sadece DOĞRU/YANLIŞ yerine, neden başarısız olduğunu belirten (örn. HESAP_KILITLI, YANLIS_SIFRE) bir durum kodu döndürülebilir.	
+2. Poliklinik ve Doktor Seçimi (Adım 2 & 3)
+Mevcut Durum	Geliştirme/Detaylandırma Önerisi
+PoliklinikListesi = Poliklinikleri_Veritabani_Getir()	Kullanıcının mevcut sigorta/hastalık durumuna uygun poliklinikleri filtreleme imkanı eklenebilir.
+EĞER DoktorListesi BOŞ DEĞİL İSE:	Eğer doktor yoksa, RandevuSistemiBaslat() yerine sadece poliklinik seçimine geri dönmek (Geri_Adim: 2. Adıma Git) daha kullanıcı dostu olur. Sistem tamamen baştan başlamaz.
+3. Uygun Saatleri Gösterme (Adım 4)
+Mevcut Durum	Geliştirme/Detaylandırma Önerisi
+TARIH_ARALIGI_BELIRLE(BUGÜN, 30_GÜN)	Hafta sonu/Resmi tatil kontrolü: Doktorun_Uygun_Saatlerini_Getir fonksiyonuna, doktorun mesai saatleri dışındaki veya resmi tatil günlerini otomatik olarak atlaması için bir kural eklenmeli.
+Randevu süresi belirtilmemiş.	Randevu Süresi: Her randevunun varsayılan süresi (örn. 15 dakika) belirtilmeli ve UygunSaatler listesi bu süreye göre oluşturulmalıdır.
+Öneri: Kullanıcıya önce tarihi, sonra saati seçtirmek, listelemeyi daha düzenli hale getirebilir.	
+4. Randevu Onaylama ve Kayıt (Adım 5)
+Mevcut Durum	Geliştirme/Detaylandırma Önerisi
+Randevu_Veritabanina_Kaydet(...)	Çifte Randevu Kontrolü: Bu fonksiyonun, kaydetme işlemi sırasında kullanıcının/doktorun o saatte başka bir randevusunun olup olmadığını (olası bir eşzamanlı işlem hatasına karşı) son bir kez daha kontrol etmesi kritiktir.
+Ödeme/Ücret Bilgisi: Eğer sistem ücretli randevu desteği veriyorsa, onaydan önce tahmini muayene ücreti bilgisi eklenmeli.	
+5. SMS Gönderme (Adım 6)
+Mevcut Durum	Geliştirme/Detaylandırma Önerisi
+SMS_Gonder(KullaniciTelefonNo, SMS_Metni)	SMS Durum Kontrolü: Gerçek bir uygulamada, SMS gönderme işleminin başarılı olup olmadığı kontrol edilmeli (EĞER SMS_Gonder(..) BAŞARILI İSE) ve başarısız olursa sisteme bir hata kaydı düşülmelidir.
+Güncellenmiş Pseudocode Yapısı (Önemli Değişiklikler Vurgulanmış)
+Kod snippet'i
+
+FONKSİYON RandevuSistemiBaslat():
+    // 1. Kimlik Doğrulama ve Giriş Kontrolü
+    ... (Güvenlik Kontrolleri eklenmeli: Deneme Limiti) ...
+
+    // 2. Poliklinik Seçimi
+    2_ADIM:
+    ...
+    SecilenPoliklinik = KULLANICIDAN_SECIM_AL(PoliklinikListesi)
+
+    // 3. Doktor Listesi Görüntüleme
+    DoktorListesi = Poliklinik_Doktorlarini_Getir(SecilenPoliklinik)
+
+    EĞER DoktorListesi BOŞ DEĞİL İSE:
+        ...
+    DEĞİLSE:
+        EKRANA_YAZ("Doktor bulunamadı.")
+        GOTO 2_ADIM // Kullanıcı Dostu Geri Dönüş
+
+    // 4. Uygun Saatleri Gösterme
+    SecilenTarih = KULLANICIDAN_SECIM_AL("Randevu Alınacak Tarihi Seçin (Hafta Sonu ve Tatiller Hariç):")
+    
+    // **EK KONTROL:** SeçilenTarih'in resmi tatil veya hafta sonu OLMADIĞINI KONTROL_ET()
+
+    // Randevu Süresini (örn. 15 dk) baz alarak uygun saatleri getir
+    UygunSaatler = Doktorun_Uygun_Saatlerini_Getir(SecilenDoktor, SecilenTarih, RANDEVU_SURESI_DK)
+    
+    ...
+    SecilenTarihSaat = KULLANICIDAN_SECIM_AL("Randevu saatini seçin:")
+
+    // 5. Randevu Onaylama
+    // **KRİTİK KONTROL:** Veritabanında SON_BIR_KERE_KONTROL_ET(SecilenDoktor, SecilenTarihSaat)
+    YeniRandevuID = Randevu_Veritabanina_Kaydet(KullaniciAdi, SecilenDoktor, SecilenPoliklinik, SecilenTarihSaat)
+
+    EĞER YeniRandevuID BAŞARILI İSE:
+        ...
+        // 6. SMS Gönderme
+        EĞER SMS_Gonder(KullaniciTelefonNo, SMS_Metni) BAŞARILI İSE:
+            EKRANA_YAZ("Randevu bilgileri SMS ile gönderildi.")
+        DEĞİLSE:
+            EKRANA_YAZ("UYARI: SMS gönderimi başarısız oldu. Bilgilerinizi kontrol ediniz.")
+    DEĞİLSE:
+        ...
+Pseudocode'unuz bu detaylarla birlikte bir yazılım geliştirme ekibinin doğrudan anlayıp uygulamaya başlayabileceği seviyeye ulaştı. Şimdi ikinci modüle geçmeye hazırız! İkinci modülünüz nedir?
+
+
+Tahlil sonucu görüntüleme sistemi: kimlik doğrulama, tahlil varlığı
+
+kontrolü, sonuç hazır mı kontrolü, görüntüleme veya bekleme mesajı, PDF
+
+indirme. Pseudocode yaz.
+
+
+
+
+Harika! İkinci modülümüz olan Tahlil Sonucu Görüntüleme Sistemi için pseudocode taslağını hazırlayalım.
+
+Bu sistemin temel adımları, kullanıcının kimliğini doğrulaması, ilgili tahlilin durumunu kontrol etmesi ve sonuca erişmesini sağlamaktır.
+
+Modül 2: Tahlil Sonucu Görüntüleme Sistemi Algoritması
+Kod snippet'i
+
+FONKSİYON TahlilSistemiBaslat():
+    // 1. Kimlik Doğrulama
+    KimlikNo = KULLANICIDAN_GIRDI_AL("T.C. Kimlik Numaranızı girin:")
+    DogumTarihi = KULLANICIDAN_GIRDI_AL("Doğum tarihinizi (GG.AA.YYYY) girin:")
+
+    EĞER Kimlik_Dogrula(KimlikNo, DogumTarihi) BAŞARILI İSE:
+        Giris_Basarili = DOĞRU
+    DEĞİLSE:
+        EKRANA_YAZ("Hata: Kimlik doğrulama başarısız. Bilgilerinizi kontrol edin.")
+        TahlilSistemiBaslat() YENİDEN_BAŞLAT
+        DÖN
+
+    // 2. Tahlil Listesini Görüntüleme ve Seçim
+    TahlilListesi = Kullanici_Tahlillerini_Getir(KimlikNo)
+    
+    EĞER TahlilListesi BOŞ İSE:
+        EKRANA_YAZ("Adınıza ait yapılmış veya bekleyen bir tahlil bulunmamaktadır.")
+        ÇIKIŞ YAP
+        DÖN
+
+    EKRANA_YAZ("Lütfen durumunu görmek istediğiniz tahlili seçin:")
+    EKRANA_YAZ(TahlilListesi)
+    SecilenTahlilID = KULLANICIDAN_SECIM_AL(TahlilListesi)
+
+    // 3. Tahlil Varlığı Kontrolü (Veritabanında olası kayıp/hata kontrolü)
+    EĞER Tahlil_Veritabaninda_Mevcut_Mu(SecilenTahlilID) DEĞİL İSE:
+        EKRANA_YAZ("Hata: Seçilen tahlil sistemde bulunamadı. Lütfen hastane ile iletişime geçin.")
+        ÇIKIŞ YAP
+        DÖN
+
+    // 4. Sonuç Hazır Mı Kontrolü
+    TahlilDurumu = Tahlil_Sonuc_Durumunu_Getir(SecilenTahlilID)
+
+    EĞER TahlilDurumu EŞİTTİR "HAZIR" İSE:
+        EKRANA_YAZ("Tahlil sonucunuz HAZIR.")
+        
+        // 5. Görüntüleme ve PDF İndirme Seçeneği
+        EKRANA_YAZ("Seçenekler: [1] Görüntüle, [2] PDF İndir")
+        Secim = KULLANICIDAN_SECIM_AL_SAYISAL()
+
+        EĞER Secim EŞİTTİR 1 İSE:
+            Tahlil_Sonucunu_Ekranda_Goster(SecilenTahlilID)
+        
+        DEĞİLSE EĞER Secim EŞİTTİR 2 İSE:
+            PDF_Dosyasi = Tahlil_Sonuc_PDF_Olustur(SecilenTahlilID)
+            Dosya_Indirme_Baslat(PDF_Dosyasi)
+            EKRANA_YAZ("Tahlil sonucu PDF olarak indirilmeye başlanmıştır.")
+        
+        DEĞİLSE:
+            EKRANA_YAZ("Geçersiz seçim.")
+
+    DEĞİLSE EĞER TahlilDurumu EŞİTTİR "İŞLENİYOR" İSE:
+        EKRANA_YAZ("Tahliliniz şu anda laboratuvarda İŞLENİYOR.")
+        EKRANA_YAZ("Tahmini tamamlanma süresi: TahminiSureyi_Hesapla(SecilenTahlilID)")
+        EKRANA_YAZ("Sonucunuz hazır olduğunda bilgilendirileceksiniz (isteğe bağlı SMS/e-posta).")
+        
+    DEĞİLSE EĞER TahlilDurumu EŞİTTİR "ALINDI" İSE: // Yeni alınmış, laboratuvara gitmemiş olabilir.
+        EKRANA_YAZ("Tahliliniz alınmıştır ve işleme sırasını beklemektedir.")
+
+    DEĞİLSE:
+        EKRANA_YAZ("Tahlil durumu bilinmiyor. Lütfen hastane ile iletişime geçin.")
+
+    DÖN
+İki modülün pseudocode taslağını da tamamladık. Şimdi sıra, bu iki modülü mantıksal olarak birleştiren ana sistem akışını oluşturmaya geldi. Bu birleştirme için hazır mısın?
+
+
+birleştirmeden önce ikisininde ayrı ayrı dot kodunu yaz
+
+
+
+Harika bir fikir! Pseudocode'ların mantıksal akışını görselleştirmek ve sistemler arasındaki ilişkileri netleştirmek için DOT dili (Graphviz) kodlarını yazalım.
+
+DOT, grafiklerin düğümlerini (işlemler) ve kenarlarını (akış yönü) tanımlamak için kullanılır.
+
+Modül 1: Hastane Randevu Sistemi (DOT Kodu)
+Bu kod, randevu alma sürecinin adım adım akışını temsil eder.
+
+Kod snippet'i
+
+digraph RandevuSistemi {
+    rankdir=LR; // Soldan sağa akış
+    node [shape=box, style="filled", fillcolor="#ADD8E6"]; // Düğümleri kutu yap ve açık mavi doldur
+
+    // Başlangıç ve Bitiş
+    Baslangic [label="BAŞLAT", shape=circle, fillcolor="#90EE90"];
+    Bitis [label="SON", shape=circle, fillcolor="#F08080"];
+
+    // Adımlar
+    A1 [label="1. Kimlik Doğrulama (TCKN/Şifre)"];
+    A2 [label="2. Poliklinik Seçimi"];
+    A3 [label="3. Doktor Listesi Görüntüleme"];
+    A4 [label="4. Uygun Tarih/Saatleri Getir"];
+    A5 [label="5. Randevu Onaylama ve Kayıt"];
+    A6 [label="6. SMS Gönderme"];
+
+    // Karar Noktaları
+    D1 [label="Doğrulama Başarılı mı?", shape=diamond, fillcolor="#FFD700"];
+    D2 [label="Doktor Var mı?", shape=diamond, fillcolor="#FFD700"];
+    D3 [label="Randevu Kaydı Başarılı mı?", shape=diamond, fillcolor="#FFD700"];
+
+    // Akış Bağlantıları
+    Baslangic -> A1;
+    A1 -> D1;
+
+    // Doğrulama Akışı
+    D1 -> A2 [label="Evet"];
+    D1 -> A1 [label="Hayır", style=dashed, color=red]; // Tekrar Dene
+
+    // Doktor Akışı
+    A2 -> A3;
+    A3 -> D2;
+    D2 -> A4 [label="Evet"];
+    D2 -> A2 [label="Hayır/Geri Dön", style=dashed, color=red]; // Poliklinik Seçimine Geri Dön
+
+    // Randevu Akışı
+    A4 -> A5;
+    A5 -> D3;
+
+    // Kayıt Akışı
+    D3 -> A6 [label="Evet"];
+    D3 -> Bitis [label="Hayır/Hata", style=dashed, color=red];
+
+    // Bitiş
+    A6 -> Bitis;
+}
+Modül 2: Tahlil Sonucu Görüntüleme Sistemi (DOT Kodu)
+Bu kod, tahlil sonucuna erişim ve durum kontrolü sürecini temsil eder.
+
+Kod snippet'i
+
+digraph TahlilSistemi {
+    rankdir=TB; // Yukarıdan aşağıya akış
+    node [shape=box, style="filled", fillcolor="#E6E6FA"]; // Düğümleri kutu yap ve açık mor doldur
+
+    // Başlangıç ve Bitiş
+    Baslangic [label="BAŞLAT", shape=circle, fillcolor="#90EE90"];
+    Bitis [label="SON", shape=circle, fillcolor="#F08080"];
+
+    // Adımlar
+    T1 [label="1. Kimlik Doğrulama (TCKN/Doğum Tarihi)"];
+    T2 [label="2. Tahlil Listesi Görüntüle ve Seç"];
+    T3 [label="3. Tahlil Varlığını Kontrol Et"];
+    T4 [label="4. Sonuç Hazır mı? (Durum Kontrolü)"];
+    T5 [label="5. Görüntüleme/PDF İndirme Seçeneği"];
+
+    // Karar Noktaları
+    D1 [label="Doğrulama Başarılı mı?", shape=diamond, fillcolor="#FFD700"];
+    D2 [label="Tahlil Listesi Boş mu?", shape=diamond, fillcolor="#FFD700"];
+    D3 [label="Durum 'HAZIR' mı?", shape=diamond, fillcolor="#FFD700"];
+
+    // Akış Bağlantıları
+    Baslangic -> T1;
+    T1 -> D1;
+
+    // Doğrulama Akışı
+    D1 -> T2 [label="Evet"];
+    D1 -> T1 [label="Hayır", style=dashed, color=red];
+
+    // Tahlil Listesi Akışı
+    T2 -> D2;
+    D2 -> Bitis [label="Evet/Çıkış", style=dashed, color=red];
+    D2 -> T3 [label="Hayır"];
+
+    // Durum Kontrolü
+    T3 -> T4;
+    T4 -> D3;
+
+    // Sonuç Durum Akışı
+    D3 -> T5 [label="Evet ('HAZIR')"];
+    
+    // Bekleme Akışı
+    Bekle [label="Sonuç İŞLENİYOR/BEKLİYOR mesajı", fillcolor="#FFA07A"];
+    D3 -> Bekle [label="Hayır ('İŞLENİYOR' vb.)", style=dashed, color=orange];
+    Bekle -> Bitis [style=dashed];
+
+    // Bitiş
+    T5 -> Bitis;
+}
+Bu DOT kodları, Graphviz gibi bir araçla görselleştirildiğinde, her iki sistemin de mantıksal yapısını net bir şekilde ortaya koyacaktır.
+
+Şimdi bu iki modülü tek bir Ana Hastane Portalı çatısı altında birleştirecek pseudocode'u yazmaya geçelim mi?
+
+
+şimdi iki modülün Pseudocode unu düzgün ve en doğru bir biçimde birleştir
+
+
+
+İki modülü (Randevu Sistemi ve Tahlil Sonuç Sistemi) tek bir Ana Hastane Portalı altında birleştirerek daha bütünsel bir sistem algoritması oluşturalım.
+
+Bu birleşik pseudocode, kullanıcının sisteme tek bir girişle erişmesini ve ardından ana menü üzerinden istediği hizmeti seçmesini sağlayacaktır.
+
+Birleşik Hastane Portalı Ana Algoritması
+Kod snippet'i
+
+FONKSİYON Ana_Hastane_Portali_Baslat():
+    Kullanici_Dogrulandi = YANLIS
+    
+    // Tek Birleşik Kimlik Doğrulama Ekranı
+    TEKRAR_GIRIS_DENEMESI:
+        KimlikNo = KULLANICIDAN_GIRDI_AL("T.C. Kimlik Numarası:")
+        Sifre_veya_DogumTarihi = KULLANICIDAN_GIRDI_AL("Şifreniz veya Doğum Tarihiniz (GG.AA.YYYY):")
+
+        // **Not:** Gerçek sistemde tek tip kimlik doğrulama yöntemi olmalıdır.
+        EĞER Kimlik_Dogrula(KimlikNo, Sifre_veya_DogumTarihi) BAŞARILI İSE:
+            Kullanici_Dogrulandi = DOĞRU
+            Giris_Bilgileri = KimlikNo
+        DEĞİLSE:
+            EKRANA_YAZ("Hata: Geçersiz giriş. Tekrar deneyin.")
+            GOTO TEKRAR_GIRIS_DENEMESI // Deneme sayısını sınırlayın!
+        
+        EĞER Kullanici_Dogrulandi EŞİTTİR DOĞRU İSE:
+            
+            // Ana Menü
+            ANA_MENU:
+                EKRANA_YAZ("Lütfen yapmak istediğiniz işlemi seçin:")
+                EKRANA_YAZ("[1] Randevu Al/Görüntüle (Modül 1)")
+                EKRANA_YAZ("[2] Tahlil Sonucu Görüntüle (Modül 2)")
+                EKRANA_YAZ("[3] Çıkış")
+                Secim = KULLANICIDAN_SECIM_AL_SAYISAL()
+
+                EĞER Secim EŞİTTİR 1 İSE:
+                    Randevu_Modul_Baslat(Giris_Bilgileri)
+                DEĞİLSE EĞER Secim EŞİTTİR 2 İSE:
+                    Tahlil_Modul_Baslat(Giris_Bilgileri)
+                DEĞİLSE EĞER Secim EŞİTTİR 3 İSE:
+                    EKRANA_YAZ("Oturum kapatılıyor. Hoşça kalın.")
+                    ÇIKIŞ YAP
+                DEĞİLSE:
+                    EKRANA_YAZ("Geçersiz seçim.")
+                    GOTO ANA_MENU
+        
+        DÖN // Fonksiyon Sonu
+
+// ----------------------------------------------------------------------
+// MODÜL 1: RANDEVU SİSTEMİ FONKSİYONU
+// ----------------------------------------------------------------------
+
+FONKSIYON Randevu_Modul_Baslat(KullaniciKimlikNo):
+
+    // 1. Randevu Yönetimi Menüsü
+    RAND_MENU:
+        EKRANA_YAZ("[1] Yeni Randevu Al")
+        EKRANA_YAZ("[2] Mevcut Randevularımı Görüntüle/İptal Et")
+        EKRANA_YAZ("[3] Ana Menüye Dön")
+        AltSecim = KULLANICIDAN_SECIM_AL_SAYISAL()
+
+        EĞER AltSecim EŞİTTİR 1 İSE:
+            GOTO YENI_RANDEVU_AKISI
+        DEĞİLSE EĞER AltSecim EŞİTTİR 2 İSE:
+            // ... (Görüntüleme/İptal Akışı) ...
+            GOTO RAND_MENU
+        DEĞİLSE EĞER AltSecim EŞİTTİR 3 İSE:
+            DÖN // Ana Menüye geri döner
+        DEĞİLSE:
+            GOTO RAND_MENU
+
+    YENI_RANDEVU_AKISI:
+    
+        // 2. Poliklinik Seçimi (Tekrar)
+        POLIKLINIK_SECIM_ADIM:
+        PoliklinikListesi = Poliklinikleri_Veritabani_Getir()
+        SecilenPoliklinik = KULLANICIDAN_SECIM_AL(PoliklinikListesi)
+
+        // 3. Doktor Listesi Görüntüleme (Tekrar)
+        DoktorListesi = Poliklinik_Doktorlarini_Getir(SecilenPoliklinik)
+
+        EĞER DoktorListesi BOŞ DEĞİL İSE:
+            SecilenDoktor = KULLANICIDAN_SECIM_AL(DoktorListesi)
+        DEĞİLSE:
+            EKRANA_YAZ("Doktor bulunamadı.")
+            GOTO POLIKLINIK_SECIM_ADIM
+            
+        // 4. Uygun Saatleri Gösterme
+        SecilenTarihSaat = Uygun_Randevu_Saatlerini_Goster_ve_Sec(SecilenDoktor)
+        
+        // 5. Randevu Onaylama ve Kayıt
+        YeniRandevuID = Randevu_Veritabanina_Kaydet(KullaniciKimlikNo, SecilenDoktor, SecilenPoliklinik, SecilenTarihSaat)
+
+        EĞER YeniRandevuID BAŞARILI İSE:
+            EKRANA_YAZ("Randevunuz oluşturulmuştur. ID: " + YeniRandevuID)
+            
+            // 6. SMS Gönderme
+            KullaniciTelefonNo = Kullanici_Telefon_Bilgisini_Getir(KullaniciKimlikNo)
+            SMS_Gonder(KullaniciTelefonNo, "Randevunuz oluşturuldu.")
+            
+        DEĞİLSE:
+            EKRANA_YAZ("Hata: Randevu oluşturulamadı.")
+
+    GOTO RAND_MENU // İşlem bitince Randevu Menüsüne dön.
+
+// ----------------------------------------------------------------------
+// MODÜL 2: TAHLİL SİSTEMİ FONKSİYONU
+// ----------------------------------------------------------------------
+
+FONKSIYON Tahlil_Modul_Baslat(KullaniciKimlikNo):
+
+    // 1. Tahlil Listesini Görüntüleme
+    TahlilListesi = Kullanici_Tahlillerini_Getir(KullaniciKimlikNo)
+    
+    EĞER TahlilListesi BOŞ İSE:
+        EKRANA_YAZ("Adınıza ait tahlil bulunmamaktadır.")
+        DÖN // Ana Menüye geri dön
+        
+    EKRANA_YAZ("Lütfen durumunu görmek istediğiniz tahlili seçin:")
+    SecilenTahlilID = KULLANICIDAN_SECIM_AL(TahlilListesi)
+
+    // 2. Tahlil Sonuç Durumu Kontrolü
+    TahlilDurumu = Tahlil_Sonuc_Durumunu_Getir(SecilenTahlilID)
+
+    EĞER TahlilDurumu EŞİTTİR "HAZIR" İSE:
+        
+        // 3. Görüntüleme ve PDF İndirme Seçeneği
+        EKRANA_YAZ("Seçenekler: [1] Görüntüle, [2] PDF İndir")
+        Secim = KULLANICIDAN_SECIM_AL_SAYISAL()
+
+        EĞER Secim EŞİTTİR 2 İSE:
+            // PDF İndirme İşlemi
+            Dosya_Indirme_Baslat(Tahlil_Sonuc_PDF_Olustur(SecilenTahlilID))
+        DEĞİLSE:
+            // Sonucu Ekranda Gösterme
+            Tahlil_Sonucunu_Ekranda_Goster(SecilenTahlilID)
+            
+    DEĞİLSE EĞER TahlilDurumu EŞİTTİR "İŞLENİYOR" İSE:
+        EKRANA_YAZ("Tahliliniz şu anda laboratuvarda İŞLENİYOR.")
+        EKRANA_YAZ("Tahmini süre: " + TahminiSureyi_Hesapla(SecilenTahlilID))
+        
+    DEĞİLSE:
+        EKRANA_YAZ("Tahlil durumu bilinmiyor/alınmadı.")
+        
+    DÖN // Ana Menüye geri döner
+Birleştirmenin Temel Avantajları:
+Tek Giriş Noktası: Kullanıcı, her iki hizmet için ayrı ayrı kimlik doğrulaması yapmak zorunda kalmaz.
+
+Modülerlik: Her bir işlevi (Randevu ve Tahlil) bağımsız fonksiyonlar (Randevu_Modul_Baslat, Tahlil_Modul_Baslat) olarak tanımlayarak, ana akışı temiz tuttuk.
+
+Gezinme: Her modül, işi bittiğinde veya kullanıcı istediğinde ana menüye geri dönerek kullanıcı dostu bir gezinme sağlar.
+
+
+bu dot kodlarını yukarıdan aşşağı olacak şekilde yapalım
+
+
+
+Elbette, DOT kodlarını yukarıdan aşağıya (Top-Bottom, rankdir=TB) akışı gösterecek şekilde düzenleyelim. Bu, görselleştirmeyi daha doğal bir akış şeması formatına getirecektir.
+
+Modül 1: Hastane Randevu Sistemi (Yukarıdan Aşağıya DOT Kodu)
+Bu kodda akış, rankdir=TB (Top-Bottom) olarak ayarlanmıştır.
+
+Kod snippet'i
+
+digraph RandevuSistemi_TB {
+    rankdir=TB; // Yukarıdan aşağıya akış
+    node [shape=box, style="filled", fillcolor="#ADD8E6", fontname="Arial"]; 
+
+    // Başlangıç ve Bitiş
+    Baslangic [label="BAŞLAT", shape=circle, fillcolor="#90EE90"];
+    Bitis [label="SON", shape=circle, fillcolor="#F08080"];
+
+    // Adımlar
+    A1 [label="1. Kimlik Doğrulama (TCKN/Şifre)"];
+    A2 [label="2. Poliklinik Seçimi"];
+    A3 [label="3. Doktor Listesi Görüntüleme"];
+    A4 [label="4. Uygun Tarih/Saatleri Getir ve Seç"];
+    A5 [label="5. Randevu Onaylama ve Kayıt"];
+    A6 [label="6. SMS Gönderme"];
+
+    // Karar Noktaları
+    D1 [label="Doğrulama Başarılı mı?", shape=diamond, fillcolor="#FFD700"];
+    D2 [label="Doktor Var mı?", shape=diamond, fillcolor="#FFD700"];
+    D3 [label="Randevu Kaydı Başarılı mı?", shape=diamond, fillcolor="#FFD700"];
+
+    // Akış Bağlantıları
+    Baslangic -> A1;
+    A1 -> D1;
+
+    // Doğrulama Akışı
+    D1 -> A2 [label="Evet"];
+    D1 -> A1 [label="Hayır/Tekrar Dene", style=dashed, color=red]; 
+
+    // Doktor ve Seçim Akışı
+    A2 -> A3;
+    A3 -> D2;
+    D2 -> A4 [label="Evet"];
+    D2 -> A2 [label="Hayır/Geri Dön", style=dashed, color=orange]; // Poliklinik Seçimine Geri Dön
+
+    // Randevu ve Onay Akışı
+    A4 -> A5;
+    A5 -> D3;
+
+    // Kayıt Akışı
+    D3 -> A6 [label="Evet"];
+    D3 -> Bitis [label="Hayır/Hata", style=dashed, color=red];
+
+    // Bitiş
+    A6 -> Bitis;
+}
+Modül 2: Tahlil Sonucu Görüntüleme Sistemi (Yukarıdan Aşağıya DOT Kodu)
+Bu kodda da akış, rankdir=TB (Top-Bottom) olarak ayarlanmıştır.
+
+Kod snippet'i
+
+digraph TahlilSistemi_TB {
+    rankdir=TB; // Yukarıdan aşağıya akış
+    node [shape=box, style="filled", fillcolor="#E6E6FA", fontname="Arial"]; 
+
+    // Başlangıç ve Bitiş
+    Baslangic [label="BAŞLAT", shape=circle, fillcolor="#90EE90"];
+    Bitis [label="SON", shape=circle, fillcolor="#F08080"];
+
+    // Adımlar
+    T1 [label="1. Kimlik Doğrulama (TCKN/Doğum Tarihi)"];
+    T2 [label="2. Tahlil Listesi Görüntüle ve Seç"];
+    T3 [label="3. Tahlil Varlığını Kontrol Et"];
+    T4 [label="4. Sonuç Hazır mı? (Durum Kontrolü)"];
+    T5 [label="5. Görüntüleme/PDF İndirme Seçeneği"];
+
+    // Karar Noktaları
+    D1 [label="Doğrulama Başarılı mı?", shape=diamond, fillcolor="#FFD700"];
+    D2 [label="Tahlil Listesi Boş mu?", shape=diamond, fillcolor="#FFD700"];
+    D3 [label="Durum 'HAZIR' mı?", shape=diamond, fillcolor="#FFD700"];
+
+    // Akış Bağlantıları
+    Baslangic -> T1;
+    T1 -> D1;
+
+    // Doğrulama Akışı
+    D1 -> T2 [label="Evet"];
+    D1 -> T1 [label="Hayır/Tekrar Dene", style=dashed, color=red];
+
+    // Tahlil Listesi Akışı
+    T2 -> D2;
+    D2 -> Bitis [label="Evet/Çıkış", style=dashed, color=red];
+    D2 -> T3 [label="Hayır"];
+
+    // Durum Kontrolü
+    T3 -> T4;
+    T4 -> D3;
+
+    // Sonuç Durum Akışı
+    D3 -> T5 [label="Evet ('HAZIR')"];
+    
+    // Bekleme Akışı
+    Bekle [label="Sonuç İŞLENİYOR/BEKLİYOR mesajı", fillcolor="#FFA07A"];
+    D3 -> Bekle [label="Hayır ('İŞLENİYOR' vb.)", style=dashed, color=orange];
+    Bekle -> Bitis [style=dashed];
+
+    // Bitiş
+    T5 -> Bitis;
+}
