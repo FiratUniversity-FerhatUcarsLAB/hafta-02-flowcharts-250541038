@@ -1,0 +1,436 @@
+Bir ATM’den para çekme işleminin tüm adımlarını modelleyin.
+
+Sistem Gereksinimleri:
+
+Kart takılır ve PIN sorulur
+
+3 hatalı PIN girişinden sonra kart bloke olur (döngü)
+
+Bakiye sorgulanır
+
+Çekilmek istenen tutar girilir
+
+Yetersiz bakiye kontrolü yapılır (koşul)
+
+20 TL’nin katları olmalı (koşul)
+
+Günlük limit kontrolü (koşul)
+
+Para verilir ve fiş çıkar
+
+Başka işlem yapmak ister misiniz? (döngü)
+
+yazmamız gerek
+
+
+
+
+Harika bir modelleme konusu! Bir ATM'den para çekme işleminin adımlarını, belirtilen sistem gereksinimlerini de içerecek şekilde, algoritmik bir akış şeklinde modelledim.
+
+Bu adımlar, bir Akış Şeması (Flowchart) veya Sözde Kod (Pseudocode) olarak daha resmi bir şekilde de ifade edilebilir, ancak aşağıda adım adım bir senaryo akışı mevcuttur:
+
+ATM Para Çekme İşlemi Modellemesi
+1. Kart Girişi ve PIN Doğrulaması
+Kart Takılır: Müşteri, banka/kredi kartını ATM'nin kart yuvasına takar.
+
+PIN Sorulur: Sistem, müşteriden PIN (Şifre) girmesini ister.
+
+PIN Kontrol Döngüsü:
+
+Müşteri, PIN'i girer.
+
+Koşul (Doğrulama): Girilen PIN doğru mu?
+
+Evet: Adım 4'e geçilir.
+
+Hayır:
+
+Hatalı giriş sayısı 3'ten az mı?
+
+Evet: Hata mesajı gösterilir ("Hatalı PIN. Kalan deneme hakkınız: X"). Adım 2'ye dönülür (PIN tekrar sorulur).
+
+Hayır (3. Hatalı Giriş): Kart Bloke Edilir. Kart iade edilir (veya içeride tutulur), işlem sonlanır.
+
+2. İşlem Seçimi ve Bakiye Sorgulama
+Ana Menü Gösterilir: Müşteri, "Para Çekme", "Bakiye Sorgulama", "Para Yatırma" vb. seçenekleri görür.
+
+Bakiye Sorgulanır (İsteğe Bağlı):
+
+Müşteri, Bakiye Sorgulama seçeneğini seçerse, kartın güncel bakiyesi gösterilir.
+
+Müşteri, Para Çekme seçeneğini seçer.
+
+3. Tutar Girişi ve Kontroller
+Tutar Sorulur: Sistem, çekilmek istenen tutarın girilmesini ister.
+
+Tutar Kontrolleri (Koşullar):
+
+Müşteri tutarı girer.
+
+Koşul 1 (Yetersiz Bakiye Kontrolü): Çekilmek istenen tutar, mevcut bakiyeden büyük mü?
+
+Evet: Hata mesajı gösterilir ("Yetersiz Bakiye"). Adım 6'ya dönülür (Yeni tutar sorulur) veya Adım 9'a geçilir.
+
+Hayır: Koşul 2'ye geçilir.
+
+Koşul 2 (20 TL'nin Katları Kontrolü): Çekilmek istenen tutar, 20 TL'nin katı mı?
+
+Evet: Koşul 3'e geçilir.
+
+Hayır: Hata mesajı gösterilir ("Yalnızca 20 TL ve katları çekilebilir"). Adım 6'ya dönülür.
+
+Koşul 3 (Günlük Limit Kontrolü): Çekilmek istenen tutar, kartın günlük para çekme limitini aşıyor mu?
+
+Evet: Hata mesajı gösterilir ("Günlük çekme limitinizi aştınız"). Adım 6'ya dönülür.
+
+Hayır: Adım 8'e geçilir.
+
+4. İşlemin Tamamlanması
+Para Verilir: ATM, onaylanan tutarı hazırlar ve müşteriye verir.
+
+Fiş Çıkar: İşlem fişi (makbuzu) basılır ve müşteriye sunulur.
+
+Kart iade edilir.
+
+5. Tekrarlama Döngüsü
+Başka İşlem Soru Döngüsü: Sistem sorar: "Başka bir işlem yapmak ister misiniz?"
+
+Müşteriden "Evet" veya "Hayır" seçeneğini seçmesi beklenir.
+
+Cevap "Evet": Adım 4'e dönülür (Ana Menüye geçilir).
+
+Cevap "Hayır": Teşekkür mesajı gösterilir ve işlem sonlanır.
+
+Bu model, bir ATM'de gerçekleşen temel mantık akışını ve sizin istediğiniz tüm kontrol noktalarını (koşullar ve döngüler) içermektedir.
+
+
+bu algoritma için bunun graphviz kodunu yazarmısın
+
+
+
+Harika bir fikir! Yukarıda modellediğimiz ATM para çekme algoritmasını bir akış şeması (Flowchart) olarak görselleştirmek için Graphviz DOT dilini kullanabiliriz.
+
+Bu kod, algoritmadaki döngüleri (PIN denemesi, başka işlem) ve koşulları (Yetersiz Bakiye, 20 TL Katı, Limit) net bir şekilde gösterecektir.
+
+Aşağıdaki kodu bir metin dosyasına kaydedip (örneğin atm.dot), Graphviz ile işleyerek görsel çıktıyı alabilirsiniz:
+
+Kod snippet'i
+
+digraph ATM_Para_Cekme_Islemi {
+    // Grafik Ayarları
+    rankdir=TB; // Yukaridan asagiya (Top to Bottom)
+    fontname="Helvetica";
+    node [shape=box, style="filled", fillcolor="#EEEEEE", fontname="Helvetica"];
+
+    // Başlangıç ve Bitiş Düğümleri
+    Start [label="BAŞLANGIÇ\n(Kart Takıldı)", shape=oval, fillcolor="#A8DADC"];
+    End [label="SON\n(İşlem Tamamlandı)", shape=oval, fillcolor="#A8DADC"];
+
+    // İşlem Düğümleri
+    PIN_Sor [label="PIN Sorulur"];
+    PIN_Dogrula [label="PIN Doğru Mu?", shape=diamond, fillcolor="#FFBE7F"];
+    PIN_Hata [label="Hata Sayacı Artırılır"];
+    PIN_Limit [label="Hata Sayacı < 3 Mü?", shape=diamond, fillcolor="#FFBE7F"];
+    Kart_Bloke [label="Kart Bloke Edilir", fillcolor="#F28B82"];
+    Menu [label="Ana Menü Gösterilir\n(Para Çekme Seçimi)"];
+    Tutar_Gir [label="Çekilecek Tutar Girilir"];
+    Kontrol_Bakiye [label="Tutar < Bakiye Mi?", shape=diamond, fillcolor="#FFBE7F"];
+    Hata_Bakiye [label="Yetersiz Bakiye Uyarısı"];
+    Kontrol_Katlari [label="Tutar % 20 == 0 Mı?", shape=diamond, fillcolor="#FFBE7F"];
+    Hata_Katlari [label="20 TL Katları Uyarısı"];
+    Kontrol_Limit [label="Tutar < Günlük Limit Mi?", shape=diamond, fillcolor="#FFBE7F"];
+    Hata_Limit [label="Günlük Limit Aşıldı Uyarısı"];
+    Para_Ver [label="Para Verilir"];
+    Fis_Cikar [label="Fiş Çıkarılır\nKart İade Edilir"];
+    Baska_Islem [label="Başka İşlem Yapılsın Mı?", shape=diamond, fillcolor="#9AD9A8"];
+
+    // AKIŞ (Kenarlar)
+
+    // 1. PIN Kontrol Döngüsü
+    Start -> PIN_Sor;
+    PIN_Sor -> PIN_Dogrula;
+    
+    // Doğru PIN
+    PIN_Dogrula:e -> Menu [label="Evet", color="green"];
+    
+    // Hatalı PIN ve Limit Kontrolü
+    PIN_Dogrula:s -> PIN_Hata [label="Hayır", color="red"];
+    PIN_Hata -> PIN_Limit;
+    
+    // Döngü devam
+    PIN_Limit:w -> PIN_Sor [label="Evet", color="orange"];
+    // Kart bloke
+    PIN_Limit:s -> Kart_Bloke [label="Hayır", color="red"];
+    Kart_Bloke -> End;
+
+
+    // 2. Tutar Girişi ve Koşul Kontrolleri
+    Menu -> Tutar_Gir;
+    Tutar_Gir -> Kontrol_Bakiye;
+    
+    // Yetersiz Bakiye Kontrolü
+    Kontrol_Bakiye -> Hata_Bakiye [label="Hayır", color="red"];
+    Hata_Bakiye -> Tutar_Gir [label="Tekrar Dene"];
+    Kontrol_Bakiye -> Kontrol_Katlari [label="Evet", color="green"];
+
+    // 20 TL Katları Kontrolü
+    Kontrol_Katlari -> Hata_Katlari [label="Hayır", color="red"];
+    Hata_Katlari -> Tutar_Gir [label="Tekrar Dene"];
+    Kontrol_Katlari -> Kontrol_Limit [label="Evet", color="green"];
+
+    // Günlük Limit Kontrolü
+    Kontrol_Limit -> Hata_Limit [label="Hayır", color="red"];
+    Hata_Limit -> Tutar_Gir [label="Tekrar Dene"];
+    Kontrol_Limit -> Para_Ver [label="Evet", color="green"];
+
+
+    // 3. İşlem Tamamlanması ve Tekrarlama Döngüsü
+    Para_Ver -> Fis_Cikar;
+    Fis_Cikar -> Baska_Islem;
+    
+    // Başka İşlem Döngüsü
+    Baska_Islem -> Menu [label="Evet", color="blue"];
+    Baska_Islem -> End [label="Hayır", color="blue"];
+}
+Graphviz Kullanımı (Bilgi)
+Bu kodu bir görsel akış şemasına dönüştürmek için komut satırında Graphviz kuruluysa (örneğin Linux, macOS veya Windows'ta), şu komutu kullanabilirsiniz:
+
+Bash
+
+dot -Tpng atm.dot -o atm_diagram.png
+Bu komut, .dot dosyasını okur ve size atm_diagram.png adında bir görsel çıktı (akış şeması) oluşturur.
+
+
+buna günlük para çekme limitini aşıp aşmadığını da kontrol edelim bunu da ekle
+
+
+
+Günlük para çekme limitini kontrol eden adım, algoritma modellemesinde mevcut olduğu gibi, Graphviz DOT kodunda da zaten bulunmaktadır.
+
+Bu kontrol, Tutarın 20 TL'nin Katları Olup Olmadığı kontrolünden hemen sonra gelmektedir.
+
+İşte limit kontrol adımının eklenmiş ve güncellenmiş tam Graphviz kodu:
+
+Kod snippet'i
+
+digraph ATM_Para_Cekme_Islemi {
+    // Grafik Ayarları
+    rankdir=TB; // Yukaridan asagiya (Top to Bottom)
+    fontname="Helvetica";
+    node [shape=box, style="filled", fillcolor="#EEEEEE", fontname="Helvetica"];
+
+    // Başlangıç ve Bitiş Düğümleri
+    Start [label="BAŞLANGIÇ\n(Kart Takıldı)", shape=oval, fillcolor="#A8DADC"];
+    End [label="SON\n(İşlem Tamamlandı)", shape=oval, fillcolor="#A8DADC"];
+
+    // İşlem Düğümleri
+    PIN_Sor [label="PIN Sorulur"];
+    PIN_Dogrula [label="PIN Doğru Mu?", shape=diamond, fillcolor="#FFBE7F"];
+    PIN_Hata [label="Hata Sayacı Artırılır"];
+    PIN_Limit [label="Hata Sayacı < 3 Mü?", shape=diamond, fillcolor="#FFBE7F"];
+    Kart_Bloke [label="Kart Bloke Edilir", fillcolor="#F28B82"];
+    Menu [label="Ana Menü Gösterilir\n(Para Çekme Seçimi)"];
+    Tutar_Gir [label="Çekilecek Tutar Girilir"];
+    Kontrol_Bakiye [label="Tutar < Bakiye Mi?", shape=diamond, fillcolor="#FFBE7F"];
+    Hata_Bakiye [label="Yetersiz Bakiye Uyarısı"];
+    Kontrol_Katlari [label="Tutar % 20 == 0 Mı?", shape=diamond, fillcolor="#FFBE7F"];
+    Hata_Katlari [label="20 TL Katları Uyarısı"];
+    
+    // *** GÜNLÜK LİMİT KONTROLÜ DÜĞÜMLERİ ***
+    Kontrol_Limit [label="Tutar <= Günlük Limit Mi?", shape=diamond, fillcolor="#FFBE7F"];
+    Hata_Limit [label="Günlük Limit Aşıldı Uyarısı", fillcolor="#F28B82"]; 
+    
+    Para_Ver [label="Para Verilir"];
+    Fis_Cikar [label="Fiş Çıkarılır\nKart İade Edilir"];
+    Baska_Islem [label="Başka İşlem Yapılsın Mı?", shape=diamond, fillcolor="#9AD9A8"];
+
+    // AKIŞ (Kenarlar)
+
+    // 1. PIN Kontrol Döngüsü
+    Start -> PIN_Sor;
+    PIN_Sor -> PIN_Dogrula;
+    PIN_Dogrula:e -> Menu [label="Evet", color="green"];
+    PIN_Dogrula:s -> PIN_Hata [label="Hayır", color="red"];
+    PIN_Hata -> PIN_Limit;
+    PIN_Limit:w -> PIN_Sor [label="Evet", color="orange"];
+    PIN_Limit:s -> Kart_Bloke [label="Hayır", color="red"];
+    Kart_Bloke -> End;
+
+
+    // 2. Tutar Girişi ve Koşul Kontrolleri
+    Menu -> Tutar_Gir;
+    Tutar_Gir -> Kontrol_Bakiye;
+    
+    // Yetersiz Bakiye Kontrolü
+    Kontrol_Bakiye -> Hata_Bakiye [label="Hayır", color="red"];
+    Hata_Bakiye -> Tutar_Gir [label="Tekrar Dene"];
+    Kontrol_Bakiye -> Kontrol_Katlari [label="Evet", color="green"];
+
+    // 20 TL Katları Kontrolü
+    Kontrol_Katlari -> Hata_Katlari [label="Hayır", color="red"];
+    Hata_Katlari -> Tutar_Gir [label="Tekrar Dene"];
+    Kontrol_Katlari -> Kontrol_Limit [label="Evet", color="green"];
+
+    // *** GÜNLÜK LİMİT KONTROLÜ AKIŞI ***
+    Kontrol_Limit -> Hata_Limit [label="Hayır", color="red"];
+    Hata_Limit -> Tutar_Gir [label="Tekrar Dene"];
+    Kontrol_Limit -> Para_Ver [label="Evet", color="green"];
+
+
+    // 3. İşlem Tamamlanması ve Tekrarlama Döngüsü
+    Para_Ver -> Fis_Cikar;
+    Fis_Cikar -> Baska_Islem;
+    
+    // Başka İşlem Döngüsü
+    Baska_Islem -> Menu [label="Evet", color="blue"];
+    Baska_Islem -> End [label="Hayır", color="blue"];
+}
+Kodda İlgili Bölümler:
+Günlük limit kontrolü, Kontrol_Katlari (20 TL'nin katları) adımından sonra başlar ve Para_Ver adımından önce sona erer:
+
+Karar Noktası:
+
+Kod snippet'i
+
+Kontrol_Limit [label="Tutar <= Günlük Limit Mi?", shape=diamond, fillcolor="#FFBE7F"];
+Akış Yolu (Limit Aşıldı - Hayır):
+
+Kod snippet'i
+
+Kontrol_Limit -> Hata_Limit [label="Hayır", color="red"];
+Hata_Limit -> Tutar_Gir [label="Tekrar Dene"]; 
+Limit aşılırsa (Hayır), hata mesajı verilir ve müşteri yeni bir tutar girmek için (Tutar_Gir) adımına geri yönlendirilir.
+
+Akış Yolu (Limit Uygun - Evet):
+
+Kod snippet'i
+
+Kontrol_Limit -> Para_Ver [label="Evet", color="green"];
+Limit aşılmazsa (Evet), para çekme işlemi (Para_Ver) ile devam eder.
+
+
+flowchart.dot yaz hocam
+
+
+
+Elbette, ATM para çekme algoritması için hazırladığım Graphviz DOT kodunu bir kez daha, bu sefer sadece kodu içerecek şekilde, flowchart.dot dosyası içeriği olarak sunuyorum:
+
+Kod snippet'i
+
+digraph ATM_Para_Cekme_Islemi {
+    // Grafik Ayarları
+    rankdir=TB; // Yukaridan asagiya (Top to Bottom)
+    fontname="Helvetica";
+    node [shape=box, style="filled", fillcolor="#EEEEEE", fontname="Helvetica"];
+
+    // Başlangıç ve Bitiş Düğümleri
+    Start [label="BAŞLANGIÇ\n(Kart Takıldı)", shape=oval, fillcolor="#A8DADC"];
+    End [label="SON\n(İşlem Tamamlandı)", shape=oval, fillcolor="#A8DADC"];
+
+    // İşlem Düğümleri
+    PIN_Sor [label="PIN Sorulur"];
+    PIN_Dogrula [label="PIN Doğru Mu?", shape=diamond, fillcolor="#FFBE7F"];
+    PIN_Hata [label="Hata Sayacı Artırılır"];
+    PIN_Limit [label="Hata Sayacı < 3 Mü?", shape=diamond, fillcolor="#FFBE7F"];
+    Kart_Bloke [label="Kart Bloke Edilir", fillcolor="#F28B82"];
+    Menu [label="Ana Menü Gösterilir\n(Para Çekme Seçimi)"];
+    Tutar_Gir [label="Çekilecek Tutar Girilir"];
+    Kontrol_Bakiye [label="Tutar < Bakiye Mi?", shape=diamond, fillcolor="#FFBE7F"];
+    Hata_Bakiye [label="Yetersiz Bakiye Uyarısı"];
+    Kontrol_Katlari [label="Tutar % 20 == 0 Mı?", shape=diamond, fillcolor="#FFBE7F"];
+    Hata_Katlari [label="20 TL Katları Uyarısı"];
+    
+    // Günlük Limit Kontrolü
+    Kontrol_Limit [label="Tutar <= Günlük Limit Mi?", shape=diamond, fillcolor="#FFBE7F"];
+    Hata_Limit [label="Günlük Limit Aşıldı Uyarısı", fillcolor="#F28B82"]; 
+    
+    Para_Ver [label="Para Verilir"];
+    Fis_Cikar [label="Fiş Çıkarılır\nKart İade Edilir"];
+    Baska_Islem [label="Başka İşlem Yapılsın Mı?", shape=diamond, fillcolor="#9AD9A8"];
+
+    // AKIŞ (Kenarlar)
+
+    // 1. PIN Kontrol Döngüsü
+    Start -> PIN_Sor;
+    PIN_Sor -> PIN_Dogrula;
+    PIN_Dogrula:e -> Menu [label="Evet", color="green"];
+    PIN_Dogrula:s -> PIN_Hata [label="Hayır", color="red"];
+    PIN_Hata -> PIN_Limit;
+    PIN_Limit:w -> PIN_Sor [label="Evet", color="orange"];
+    PIN_Limit:s -> Kart_Bloke [label="Hayır", color="red"];
+    Kart_Bloke -> End;
+
+
+    // 2. Tutar Girişi ve Koşul Kontrolleri
+    Menu -> Tutar_Gir;
+    Tutar_Gir -> Kontrol_Bakiye;
+    
+    // Yetersiz Bakiye Kontrolü
+    Kontrol_Bakiye -> Hata_Bakiye [label="Hayır", color="red"];
+    Hata_Bakiye -> Tutar_Gir [label="Tekrar Dene"];
+    Kontrol_Bakiye -> Kontrol_Katlari [label="Evet", color="green"];
+
+    // 20 TL Katları Kontrolü
+    Kontrol_Katlari -> Hata_Katlari [label="Hayır", color="red"];
+    Hata_Katlari -> Tutar_Gir [label="Tekrar Dene"];
+    Kontrol_Katlari -> Kontrol_Limit [label="Evet", color="green"];
+
+    // Günlük Limit Kontrolü
+    Kontrol_Limit -> Hata_Limit [label="Hayır", color="red"];
+    Hata_Limit -> Tutar_Gir [label="Tekrar Dene"];
+    Kontrol_Limit -> Para_Ver [label="Evet", color="green"];
+
+
+    // 3. İşlem Tamamlanması ve Tekrarlama Döngüsü
+    Para_Ver -> Fis_Cikar;
+    Fis_Cikar -> Baska_Islem;
+    
+    // Başka İşlem Döngüsü
+    Baska_Islem -> Menu [label="Evet", color="blue"];
+    Baska_Islem -> End [label="Hayır", color="blue"];
+}
+
+bunun için açıklama ne yazalım
+
+
+
+Bu Graphviz kodunun neyi temsil ettiğini ve ATM para çekme algoritmasını nasıl modellediğini açıklayan bir metin hazırlayabiliriz.
+
+İşte bu akış şeması için kullanabileceğiniz kapsamlı bir açıklama:
+
+ATM Para Çekme Akış Şeması Açıklaması
+Bu Graphviz (DOT) kodu, bir ATM'den para çekme işleminin tüm adımlarını ve bu adımlar sırasında gerçekleşen karar mekanizmalarını (koşulları ve döngüleri) görselleştiren bir Akış Şeması oluşturur.
+
+Şema, kullanıcının kartını takmasından (Başlangıç) işlemin tamamlanmasına (Son) kadar olan mantıksal akışı takip eder.
+
+Temel Kontroller ve Akış Unsurları:
+PIN Doğrulama Döngüsü:
+
+İşlem, kullanıcının PIN girmesiyle başlar.
+
+Girilen PIN üç kez hatalı olursa, Kart Bloke Edilir ve işlem derhal sonlandırılır. Bu, bir güvenlik döngüsünü temsil eder.
+
+İşlem Seçimi ve Tutar Girişi:
+
+PIN doğrulandıktan sonra, kullanıcı Para Çekme işlemini seçer ve çekmek istediği tutarı girer.
+
+Para Çekme Koşulları (Doğrulama Zinciri):
+Girilen tutar, başarılı bir para çekme işlemi için art arda üç ana koşuldan geçmek zorundadır. Bu kontrollerden herhangi birinde başarısız olunursa, kullanıcı tutarı tekrar girmeye yönlendirilir:
+
+Bakiye Kontrolü: Çekilmek istenen tutar, mevcut bakiyeden düşük olmalıdır.
+
+20 TL Katları Kontrolü: Tutar, ATM'nin verebileceği en küçük banknotun (varsayılan olarak 20 TL) tam katı olmalıdır.
+
+Günlük Limit Kontrolü: Tutar, kart için tanımlanmış günlük para çekme limitini aşmamalıdır.
+
+İşlemin Tamamlanması:
+
+Tüm koşullar sağlandığında, Para Verilir, Fiş Çıkarılır ve kart iade edilir.
+
+Başka İşlem Döngüsü:
+
+İşlem sonunda kullanıcıya "Başka bir işlem yapmak ister misiniz?" sorusu sorulur.
+
+Cevap Evet ise, akış Ana Menüye geri döner; Hayır ise, işlem sona erer.
+
+Bu akış şeması, ATM sistemindeki kritik güvenlik (PIN Bloke) ve finansal (Bakiye, Limit, Tutar) kontrollerinin nasıl sıralandığını ve birbiriyle nasıl ilişkilendiğini net bir şekilde göstermektedir.
