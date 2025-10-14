@@ -1,0 +1,99 @@
+digraph RandevuSistemi {
+    rankdir=LR; // Soldan sağa akış
+    node [shape=box, style="filled", fillcolor="#ADD8E6"]; // Düğümleri kutu yap ve açık mavi doldur
+
+    // Başlangıç ve Bitiş
+    Baslangic [label="BAŞLAT", shape=circle, fillcolor="#90EE90"];
+    Bitis [label="SON", shape=circle, fillcolor="#F08080"];
+
+    // Adımlar
+    A1 [label="1. Kimlik Doğrulama (TCKN/Şifre)"];
+    A2 [label="2. Poliklinik Seçimi"];
+    A3 [label="3. Doktor Listesi Görüntüleme"];
+    A4 [label="4. Uygun Tarih/Saatleri Getir"];
+    A5 [label="5. Randevu Onaylama ve Kayıt"];
+    A6 [label="6. SMS Gönderme"];
+
+    // Karar Noktaları
+    D1 [label="Doğrulama Başarılı mı?", shape=diamond, fillcolor="#FFD700"];
+    D2 [label="Doktor Var mı?", shape=diamond, fillcolor="#FFD700"];
+    D3 [label="Randevu Kaydı Başarılı mı?", shape=diamond, fillcolor="#FFD700"];
+
+    // Akış Bağlantıları
+    Baslangic -> A1;
+    A1 -> D1;
+
+    // Doğrulama Akışı
+    D1 -> A2 [label="Evet"];
+    D1 -> A1 [label="Hayır", style=dashed, color=red]; // Tekrar Dene
+
+    // Doktor Akışı
+    A2 -> A3;
+    A3 -> D2;
+    D2 -> A4 [label="Evet"];
+    D2 -> A2 [label="Hayır/Geri Dön", style=dashed, color=red]; // Poliklinik Seçimine Geri Dön
+
+    // Randevu Akışı
+    A4 -> A5;
+    A5 -> D3;
+
+    // Kayıt Akışı
+    D3 -> A6 [label="Evet"];
+    D3 -> Bitis [label="Hayır/Hata", style=dashed, color=red];
+
+    // Bitiş
+    A6 -> Bitis;
+}
+
+
+2.MODÜL
+
+
+digraph TahlilSistemi {
+    rankdir=TB; // Yukarıdan aşağıya akış
+    node [shape=box, style="filled", fillcolor="#E6E6FA"]; // Düğümleri kutu yap ve açık mor doldur
+
+    // Başlangıç ve Bitiş
+    Baslangic [label="BAŞLAT", shape=circle, fillcolor="#90EE90"];
+    Bitis [label="SON", shape=circle, fillcolor="#F08080"];
+
+    // Adımlar
+    T1 [label="1. Kimlik Doğrulama (TCKN/Doğum Tarihi)"];
+    T2 [label="2. Tahlil Listesi Görüntüle ve Seç"];
+    T3 [label="3. Tahlil Varlığını Kontrol Et"];
+    T4 [label="4. Sonuç Hazır mı? (Durum Kontrolü)"];
+    T5 [label="5. Görüntüleme/PDF İndirme Seçeneği"];
+
+    // Karar Noktaları
+    D1 [label="Doğrulama Başarılı mı?", shape=diamond, fillcolor="#FFD700"];
+    D2 [label="Tahlil Listesi Boş mu?", shape=diamond, fillcolor="#FFD700"];
+    D3 [label="Durum 'HAZIR' mı?", shape=diamond, fillcolor="#FFD700"];
+
+    // Akış Bağlantıları
+    Baslangic -> T1;
+    T1 -> D1;
+
+    // Doğrulama Akışı
+    D1 -> T2 [label="Evet"];
+    D1 -> T1 [label="Hayır", style=dashed, color=red];
+
+    // Tahlil Listesi Akışı
+    T2 -> D2;
+    D2 -> Bitis [label="Evet/Çıkış", style=dashed, color=red];
+    D2 -> T3 [label="Hayır"];
+
+    // Durum Kontrolü
+    T3 -> T4;
+    T4 -> D3;
+
+    // Sonuç Durum Akışı
+    D3 -> T5 [label="Evet ('HAZIR')"];
+    
+    // Bekleme Akışı
+    Bekle [label="Sonuç İŞLENİYOR/BEKLİYOR mesajı", fillcolor="#FFA07A"];
+    D3 -> Bekle [label="Hayır ('İŞLENİYOR' vb.)", style=dashed, color=orange];
+    Bekle -> Bitis [style=dashed];
+
+    // Bitiş
+    T5 -> Bitis;
+}
