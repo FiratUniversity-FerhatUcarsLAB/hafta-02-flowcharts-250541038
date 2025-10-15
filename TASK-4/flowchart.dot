@@ -1,0 +1,61 @@
+digraph DersKayitAkisi {
+    // Düğüm Tanımlamaları
+    node [shape=box];
+    Giris [label="Başla\n(Öğrenci Girişi)"];
+    DersListesi [label="Ders Listesini Görüntüle"];
+    
+    node [shape=diamond, style=filled, fillcolor=lightblue];
+    DersSecimiDongu [label="Ders Ekle/Çıkar İşlemi Var mı?\n(Döngü Başlangıcı)"];
+    
+    node [shape=box];
+    DersSec [label="Ders Kodu Al"];
+    
+    node [shape=diamond, style=filled, fillcolor=yellow];
+    KontenjanKontrol [label="KONTROL 1: Kontenjan Var mı?"];
+    OnKosulKontrol [label="KONTROL 2: Ön Koşullar Tamam mı?"];
+    ZamanCakismasiKontrol [label="KONTROL 3: Zaman Çakışması Yok mu?"];
+    KrediLimitKontrol [label="KONTROL 4: Toplam Kredi <= 35 mi?"];
+    DanismanOnayiKontrol [label="KONTROL 5: GNO < 2.50 mi?"];
+    
+    node [shape=box];
+    DersEkle [label="Dersi Sepete Ekle\n(Kredi Artır)"];
+    DersCikar [label="Dersi Sepetten Çıkar\n(Kredi Azalt)"];
+    KayıtOzet [label="Kayıt Özeti Göster"];
+    KaydiKaydet [label="Kayıt Durumunu Kaydet"];
+    Bitis [label="Bitiş"];
+
+    // Akış (Edge) Tanımlamaları
+    Giris -> DersListesi [label="Giriş Başarılı"];
+    DersListesi -> DersSecimiDongu;
+
+    // Ders Ekleme/Çıkarma Döngüsü
+    DersSecimiDongu -> DersSec [label="EVET (Devam)"];
+    DersSecimiDongu -> KayıtOzet [label="HAYIR (Bitir)"];
+
+    // Kontroller
+    DersSec -> KontenjanKontrol;
+    
+    KontenjanKontrol -> OnKosulKontrol [label="EVET"];
+    KontenjanKontrol -> DersSecimiDongu [label="HAYIR\n(Hata)"];
+
+    OnKosulKontrol -> ZamanCakismasiKontrol [label="EVET"];
+    OnKosulKontrol -> DersSecimiDongu [label="HAYIR\n(Hata)"];
+
+    ZamanCakismasiKontrol -> KrediLimitKontrol [label="EVET"];
+    ZamanCakismasiKontrol -> DersSecimiDongu [label="HAYIR\n(Hata)"];
+
+    KrediLimitKontrol -> DersEkle [label="EVET"];
+    KrediLimitKontrol -> DersSecimiDongu [label="HAYIR\n(Hata)"];
+    
+    DersEkle -> DersSecimiDongu [label="Ders Eklendi"];
+    DersSecimiDongu -> DersCikar [label="Ders Çıkar Seçildi"]; // Çıkarma akışı eklenmiş olabilir
+    DersCikar -> DersSecimiDongu [label="Ders Çıkarıldı"];
+
+    // Onay ve Kayıt
+    KayıtOzet -> DanismanOnayiKontrol;
+    
+    DanismanOnayiKontrol -> KaydiKaydet [label="EVET\n(Durum: Onay Bekliyor)"];
+    DanismanOnayiKontrol -> KaydiKaydet [label="HAYIR\n(Durum: Tamamlandı)"];
+    
+    KaydiKaydet -> Bitis;
+}
