@@ -1,0 +1,133 @@
+seninle birlikten IoT tabanlı akıllı ev güvenlik sisteminin alarm ve bildirim süreçlerini modelliyeceğiz 
+gereksinimlerimiz:
+Sistem aktif mi kontrolü (koşul)
+Sensör okuma döngüsü (döngü - sürekli)
+Hareket sensörü kontrolü (koşul)
+Kapı/pencere sensörü kontrolü (koşul)
+Kamera aktivasyonu (koşul)
+Yanlış alarm kontrolü (ev sahibi evde mi?) (koşul)
+Alarm seviyesi belirleme (1-düşük, 2-orta, 3-y¨uksek) (koşul)
+Bildirim gönderme (SMS + App + Email)
+Bekle ve tekrar kontrol et (döngü)
+Alarm sıfırlama veya devam ettirme (koşul)
+Sonsuz Döngü Yaklaşımı
+“Akıllı ev güvenlik sistemi 7/24 ¸çalışır. Ana döngü içinde sensor okuma,
+tehdit algılama, alarm verme ve bildirim gönderme süreçlerini içeren
+pseudocode yaz.”
+Özel Notlar:
+Ana DONGÜ sürekli çalışır (DO ĞRU koşulu ile) ˘
+Her döngü iterasyonunda tüm sensorlar kontrol edilir
+Tehdit seviyesine göre farklı aksiyonlar alınır
+Alarm sıfırlama komutu gelene kadar devam eder
+DOT’ta Sonsuz Döngü
+DOT dilinde sonsuz döngüyü göstermek için geri ok kullanın ve ”Sürekli”
+etiketi ekleyin. 
+Harika! IoT tabanlı bir akıllı ev güvenlik sistemi için alarm ve bildirim süreçlerini modellemek, hem yazılım hem de sistem tasarımı açısından çok önemli. Aşağıda sana bu sistemi pseudocode olarak yazacağım, ardından DOT diliyle (Graphviz formatında) bir akış diyagramı modeli sunacağım.
+
+🔧 Pseudocode (Türkçe açıklamalı)
+Başla
+
+SistemAktifMi ← true
+
+SÜREKLİ SİSTEM DÖNGÜSÜ:
+DO
+    EĞER SistemAktifMi DEĞİLSE
+        Devam et (döngü başına)
+    SON
+
+    // Sensörlerden veri oku
+    hareketVarMi ← HareketSensörüOku()
+    kapilarAcikMi ← KapiPencereSensörüOku()
+    evSahibiEvdeMi ← EvSahibiKontrol()
+
+    // Kamera aktivasyonu
+    EĞER hareketVarMi VEYA kapilarAcikMi ISE
+        KamerayiAktifEt()
+    SON
+
+    // Alarm durumunu belirle
+    EĞER hareketVarMi VEYA kapilarAcikMi ISE
+        EĞER evSahibiEvdeMi ISE
+            // Yanlış alarm, işlem yapma
+            Devam et
+        DEĞİLSE
+            // Tehdit seviyesini belirle
+            SEVİYE ← AlarmSeviyesiBelirle(hareketVarMi, kapilarAcikMi)
+            
+            // Alarmı çalıştır
+            AlarmCalistir(SEVİYE)
+
+            // Bildirim gönder
+            BildirimGonder(SMS, App, Email, SEVİYE)
+
+            // Alarm sıfırlanana kadar bekle
+            DO
+                alarmSifirlandiMi ← AlarmSifirlamaKontrol()
+                BEKLE(5 saniye)
+            WHILE alarmSifirlandiMi DEĞİL
+        SON
+    SON
+
+    // Bekle ve tekrar kontrol et
+    BEKLE(1 saniye)
+
+WHILE DOĞRU  // Sonsuz döngü
+
+🔄 DOT Dilinde Süreç Modeli (Graphviz)
+
+Aşağıda, yukarıdaki süreci temsil eden bir DOT (Graphviz) formatında akış diyagramı yer alıyor. Bunu görselleştirmek için Graphviz araçlarını kullanabilirsin.
+
+digraph AkilliEvGuvenlikSistemi {
+    rankdir=LR;
+    node [shape=box, style=rounded];
+
+    Start [label="Başla"]
+    SistemKontrol [label="Sistem aktif mi?"]
+    SensorOkuma [label="Tüm sensörleri oku\n(Hareket, Kapı/Pencere)"]
+    KameraAktif [label="Kamera aktivasyonu gerekli mi?"]
+    EvSahibiKontrol [label="Ev sahibi evde mi?"]
+    AlarmSeviye [label="Alarm seviyesi belirle\n(1-2-3)"]
+    AlarmCalistir [label="Alarmı çalıştır"]
+    Bildirim [label="Bildirim gönder\n(SMS, App, Email)"]
+    BekleKontrolEt [label="Bekle ve tekrar kontrol et"]
+    AlarmSifirla [label="Alarm sıfırlandı mı?"]
+    EndLoop [label="Devam et"]
+
+    // Sonsuz döngü oku
+    LoopBack [label="Sürekli", shape=oval]
+
+    // Bağlantılar
+    Start -> SistemKontrol
+    SistemKontrol -> SensorOkuma [label="Evet"]
+    SistemKontrol -> LoopBack [label="Hayır"]
+
+    SensorOkuma -> KameraAktif
+    KameraAktif -> EvSahibiKontrol [label="Evet"]
+    KameraAktif -> LoopBack [label="Hayır"]
+
+    EvSahibiKontrol -> LoopBack [label="Evet (Yanlış alarm)"]
+    EvSahibiKontrol -> AlarmSeviye [label="Hayır"]
+
+    AlarmSeviye -> AlarmCalistir
+    AlarmCalistir -> Bildirim
+    Bildirim -> AlarmSifirla
+
+    AlarmSifirla -> AlarmSifirla [label="Hayır\n(Bekle 5 sn)"]
+    AlarmSifirla -> BekleKontrolEt [label="Evet"]
+
+    BekleKontrolEt -> LoopBack
+
+    LoopBack -> SistemKontrol [label="↩ Sonsuz Döngü"]
+}
+
+🔍 Açıklamalar:
+
+Bu modelde sonsuz döngü LoopBack düğümü ile gösteriliyor (etiket: “Sürekli”).
+
+Her döngüde sistem aktif mi diye kontrol edilir.
+
+Eğer tehdit algılanırsa, alarm seviyesi belirlenip bildirim gönderilir.
+
+Alarm, kullanıcı tarafından sıfırlanana kadar sistem bekler.
+
+Sistemde yanlış alarm olasılığına karşı ev sahibi kontrolü yapılır.
