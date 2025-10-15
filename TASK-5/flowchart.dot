@@ -1,0 +1,42 @@
+digraph AkilliEvGuvenlikSistemi {
+    rankdir=LR;
+    node [shape=box, style=rounded];
+
+    Start [label="Başla"]
+    SistemKontrol [label="Sistem aktif mi?"]
+    SensorOkuma [label="Tüm sensörleri oku\n(Hareket, Kapı/Pencere)"]
+    KameraAktif [label="Kamera aktivasyonu gerekli mi?"]
+    EvSahibiKontrol [label="Ev sahibi evde mi?"]
+    AlarmSeviye [label="Alarm seviyesi belirle\n(1-2-3)"]
+    AlarmCalistir [label="Alarmı çalıştır"]
+    Bildirim [label="Bildirim gönder\n(SMS, App, Email)"]
+    BekleKontrolEt [label="Bekle ve tekrar kontrol et"]
+    AlarmSifirla [label="Alarm sıfırlandı mı?"]
+    EndLoop [label="Devam et"]
+
+    // Sonsuz döngü oku
+    LoopBack [label="Sürekli", shape=oval]
+
+    // Bağlantılar
+    Start -> SistemKontrol
+    SistemKontrol -> SensorOkuma [label="Evet"]
+    SistemKontrol -> LoopBack [label="Hayır"]
+
+    SensorOkuma -> KameraAktif
+    KameraAktif -> EvSahibiKontrol [label="Evet"]
+    KameraAktif -> LoopBack [label="Hayır"]
+
+    EvSahibiKontrol -> LoopBack [label="Evet (Yanlış alarm)"]
+    EvSahibiKontrol -> AlarmSeviye [label="Hayır"]
+
+    AlarmSeviye -> AlarmCalistir
+    AlarmCalistir -> Bildirim
+    Bildirim -> AlarmSifirla
+
+    AlarmSifirla -> AlarmSifirla [label="Hayır\n(Bekle 5 sn)"]
+    AlarmSifirla -> BekleKontrolEt [label="Evet"]
+
+    BekleKontrolEt -> LoopBack
+
+    LoopBack -> SistemKontrol [label="↩ Sonsuz Döngü"]
+}
